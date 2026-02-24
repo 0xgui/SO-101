@@ -39,38 +39,47 @@ lerobot-find-port
 Run once per arm, one motor at a time:
 
 ```bash
-# Follower
+# Follower (uses --robot.*)
 lerobot-setup-motors --robot.type=so101_follower --robot.port=/dev/ttyACM0
 
-# Leader
-lerobot-setup-motors --teleop.type=so101_leader --teleop.port=/dev/ttyACM1
+# Leader (uses --teleop.*)
+lerobot-setup-motors --teleop.type=so101_leader --teleop.port=/dev/ttyACM0
 ```
 
-Leader arm gear ratios:
+Motor IDs assigned (same for both arms):
 
-| Joint          | ID | Gear Ratio |
-|----------------|----|------------|
-| Shoulder Pan   | 1  | 1/191      |
-| Shoulder Lift  | 2  | 1/345      |
-| Elbow Flex     | 3  | 1/191      |
-| Wrist Flex     | 4  | 1/147      |
-| Wrist Roll     | 5  | 1/147      |
-| Gripper        | 6  | 1/147      |
+| Joint          | ID |
+|----------------|----|
+| Shoulder Pan   | 1  |
+| Shoulder Lift  | 2  |
+| Elbow Flex     | 3  |
+| Wrist Flex     | 4  |
+| Wrist Roll     | 5  |
+| Gripper        | 6  |
 
 ### 5. Calibrate
 
 ```bash
+# Follower (uses --robot.*)
 lerobot-calibrate --robot.type=so101_follower --robot.port=/dev/ttyACM0 --robot.id=my_follower_arm
-lerobot-calibrate --teleop.type=so101_leader  --teleop.port=/dev/ttyACM1 --teleop.id=my_leader_arm
+
+# Leader (uses --teleop.*)
+lerobot-calibrate --teleop.type=so101_leader --teleop.port=/dev/ttyACM0 --teleop.id=my_leader_arm
 ```
+
+During calibration: move all joints through their full range except `wrist_roll`, which is a continuous rotation joint.
 
 ### 6. Teleoperate
 
+Run `lerobot-find-port` with each arm plugged in separately to confirm which port maps to which arm. Then:
+
 ```bash
 lerobot-teleoperate \
-  --robot.type=so101_follower --robot.port=/dev/ttyACM0 --robot.id=my_follower_arm \
-  --teleop.type=so101_leader  --teleop.port=/dev/ttyACM1 --teleop.id=my_leader_arm
+  --robot.type=so101_follower --robot.port=/dev/ttyACM1 --robot.id=my_follower_arm \
+  --teleop.type=so101_leader  --teleop.port=/dev/ttyACM0 --teleop.id=my_leader_arm
 ```
+
+If you see a calibration mismatch prompt on startup, press Enter to load the saved calibration file.
 
 ## Scripts
 
