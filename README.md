@@ -1,4 +1,5 @@
 # SO-101
+![botharms](https://github.com/user-attachments/assets/1c444c48-3b49-40f4-9793-57ff7570cd64)
 
 Build notes and tooling for the [SO-101 robot arm](https://github.com/TheRobotStudio/SO-ARM100) — two arms (leader + follower) using STS3215 servos and LeRobot.
 
