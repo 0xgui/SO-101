@@ -100,6 +100,49 @@ Move servo by hand (torque off) to set min/max, then replays the motion under po
 python3 calibrate_servo.py
 ```
 
+---
+
+## Face Display (`face_display/`)
+
+ESP32-S3 SuperMini + 2.0" ST7789V 240x320 SPI TFT. Receives serial commands from the LeRobot controller and shows animated expressions.
+
+### Wiring
+
+| Display | ESP32-S3 |
+|---------|----------|
+| VCC     | 3.3V     |
+| GND     | GND      |
+| CS      | GPIO 10  |
+| DC      | GPIO 2   |
+| RST     | GPIO 3   |
+| MOSI    | GPIO 11  |
+| SCK     | GPIO 12  |
+| BLK     | 3.3V     |
+
+### Flash
+
+```bash
+pip install platformio
+cd face_display
+# set upload_port in platformio.ini, or run ../find_port.sh
+pio run -t upload
+pio device monitor
+```
+
+### Commands (115200 baud)
+
+`FACE:IDLE` `FACE:HAPPY` `FACE:SAD` `FACE:BLINK` `FACE:TALK`
+
+### Python
+
+```python
+import serial
+face = serial.Serial('/dev/ttyUSB1', 115200, timeout=1)
+face.write(b"FACE:HAPPY\n")
+```
+
+---
+
 ## References
 
 - [SO-ARM100 GitHub](https://github.com/TheRobotStudio/SO-ARM100)
