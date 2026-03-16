@@ -59,112 +59,90 @@ static const int EXPR_MAP_LEN = sizeof(EXPR_MAP) / sizeof(EXPR_MAP[0]);
 // ─────────────────────────────────────────────────────────────────────────────
 class FaceRenderer {
 public:
-    explicit FaceRenderer(TFT_eSprite& spr) : _spr(spr) {}
+    explicit FaceRenderer(TFT_eSPI& tft) : _tft(tft) {
+        _lastExpr = EXPR_COUNT;
+        _lastBlink = false;
+        _lastTick = 0;
+        _forceRedraw = true;
+    }
 
     // Call every frame. animTick increments each frame; blinkOverride forces
     // eyes closed regardless of expression.
     void draw(Expression expr, uint32_t animTick, bool blinkOverride = false) {
-        _spr.fillSprite(C_BG);
-        drawFaceOval();
-        drawEyes(expr, animTick, blinkOverride);
-        drawMouth(expr, animTick);
+        // Quantize animation to avoid redrawing every single micro-tick
+        uint32_t tick = animTick / 3;
+
+        // Skip redraw if state is exactly the same as last frame
+        if (!_forceRedraw && _lastExpr == expr && _lastBlink == blinkOverride && _lastTick == tick) {
+            return;
+        }
+
+        if (_forceRedraw) {
+            _tft.fillScreen(TFT_BLACK);
+            _forceRedraw = false;
+        }
+
+        String faceStr = "";
+        uint32_t color = TFT_WHITE;
+
+        if (blinkOverride || expr == EXPR_BLINK) {
+            faceStr = "( - _ - )";
+            color = TFT_DARKGREY;
+        } else {
+            switch (expr) {
+                case EXPR_IDLE:
+                    // Subtle bobbing or looking around
+                    faceStr = (tick % 10 < 2) ? "( O _ O )" : "( o _ o )";
+                    color = TFT_WHITE;
+                    break;
+                case EXPR_HAPPY:
+                    // Bouncing happy emoji
+                    faceStr = (tick % 4 < 2) ? "( ^ w ^ )" : "( > w < )";
+                    color = TFT_GREEN;
+                    break;
+                case EXPR_SAD:
+                    // Flowing tears
+                    faceStr = (tick % 4 < 2) ? "( ; _ ; )" : "( T _ T )";
+                    color = TFT_CYAN;
+                    break;
+                case EXPR_TALK: {
+                    // Animated speaking mouth
+                    int phase = tick % 4;
+                    if (phase == 0) faceStr = "( o _ o )";
+                    else if (phase == 1) faceStr = "( o O o )";
+                    else if (phase == 2) faceStr = "( o 0 o )";
+                    else faceStr = "( o O o )";
+                    color = TFT_YELLOW;
+                    break;
+                }
+                default:
+                    faceStr = "( . _ . )";
+                    color = TFT_LIGHTGREY;
+                    break;
+            }
+        }
+
+        _tft.setTextColor(color, TFT_BLACK); // Background black wipes the old chars entirely!
+        _tft.setTextDatum(MC_DATUM); // Middle center
+        _tft.setTextSize(4); // Font 1 (glcd) scaled by 4 (24px wide * 32px tall per char)
+        
+        // Pad the string with spaces to safely overwrite parts of older, wider expressions
+        String paddedStr = "   " + faceStr + "   ";
+        _tft.drawString(paddedStr, 120, 160, 1);
+
+        _lastExpr = expr;
+        _lastBlink = blinkOverride;
+        _lastTick = tick;
+    }
+
+    void forceRedraw() {
+        _forceRedraw = true;
     }
 
 private:
-    TFT_eSprite& _spr;
-
-    // ── Face oval ────────────────────────────────────────────────────────────
-    void drawFaceOval() {
-        // Filled face
-        _spr.fillEllipse(FACE_CX, FACE_CY, FACE_RX, FACE_RY, C_FACE);
-        // Outline (2px)
-        _spr.drawEllipse(FACE_CX, FACE_CY, FACE_RX,     FACE_RY,     C_OUTLINE);
-        _spr.drawEllipse(FACE_CX, FACE_CY, FACE_RX - 1, FACE_RY - 1, C_OUTLINE);
-    }
-
-    // ── Single eye ───────────────────────────────────────────────────────────
-    void drawEye(int cx, int cy, bool closed, bool squint = false) {
-        if (closed) {
-            // Closed: flat line
-            _spr.drawFastHLine(cx - EYE_RW, cy, EYE_RW * 2, C_EYE);
-            _spr.drawFastHLine(cx - EYE_RW, cy + 1, EYE_RW * 2, C_EYE);
-            return;
-        }
-        if (squint) {
-            // Squint (sad): half-height ellipse, flat top
-            _spr.fillEllipse(cx, cy + EYE_RH / 2, EYE_RW, EYE_RH / 2, C_EYE);
-            _spr.fillRect(cx - EYE_RW, cy - EYE_RH / 2, EYE_RW * 2, EYE_RH / 2, C_FACE);
-            return;
-        }
-        // Normal eye
-        _spr.fillEllipse(cx, cy, EYE_RW, EYE_RH, C_EYE);
-        // Pupil
-        _spr.fillCircle(cx, cy, PUPIL_R, C_PUPIL);
-        // Gleam (top-left of pupil)
-        _spr.fillCircle(cx - GLEAM_R, cy - GLEAM_R, GLEAM_R, C_GLEAM);
-    }
-
-    // ── Eyes (both) ──────────────────────────────────────────────────────────
-    void drawEyes(Expression expr, uint32_t tick, bool blinkOverride) {
-        bool closed = blinkOverride || (expr == EXPR_BLINK);
-        bool squint = (expr == EXPR_SAD);
-        bool happy  = (expr == EXPR_HAPPY);
-
-        if (happy) {
-            // Happy: upward arc "^" eyes
-            drawHappyEye(EYE_LX, EYE_Y);
-            drawHappyEye(EYE_RX, EYE_Y);
-        } else {
-            drawEye(EYE_LX, EYE_Y, closed, squint);
-            drawEye(EYE_RX, EYE_Y, closed, squint);
-        }
-    }
-
-    void drawHappyEye(int cx, int cy) {
-        // "^" arc: filled semicircle with bottom cut
-        _spr.fillEllipse(cx, cy, EYE_RW, EYE_RH, C_EYE);
-        _spr.fillRect(cx - EYE_RW, cy, EYE_RW * 2, EYE_RH + 2, C_FACE);
-    }
-
-    // ── Mouth ────────────────────────────────────────────────────────────────
-    void drawMouth(Expression expr, uint32_t tick) {
-        switch (expr) {
-            case EXPR_HAPPY:
-                // Big smile: arc below centre
-                drawArcMouth(MOUTH_CX, MOUTH_CY - 20, 55, 48, 15, 165);
-                break;
-            case EXPR_SAD:
-                // Frown: arc above a lower centre point
-                drawArcMouth(MOUTH_CX, MOUTH_CY + 30, 55, 48, 195, 345);
-                break;
-            case EXPR_TALK: {
-                // Animated oval that grows/shrinks (4-frame cycle)
-                int phase = tick % 8;
-                int mh = (phase < 4) ? (4 + phase * 5) : (24 - (phase - 4) * 5);
-                _spr.fillEllipse(MOUTH_CX, MOUTH_CY, MOUTH_W / 2, mh, C_MOUTH);
-                // Teeth line
-                _spr.drawFastHLine(MOUTH_CX - MOUTH_W / 2 + 6, MOUTH_CY, MOUTH_W - 12, C_FACE);
-                break;
-            }
-            case EXPR_BLINK:
-            case EXPR_IDLE:
-            default:
-                // Neutral: thin horizontal line
-                _spr.fillRoundRect(MOUTH_CX - MOUTH_W / 2, MOUTH_CY - 3,
-                                   MOUTH_W, 6, 3, C_MOUTH);
-                break;
-        }
-    }
-
-    // Approximate arc with a series of filled circles (TFT_eSPI drawArc needs
-    // TFT_eSPI v2.4+ and can be slow; this is portable and fast enough)
-    void drawArcMouth(int cx, int cy, int rx, int ry,
-                      int startDeg, int endDeg) {
-        for (int deg = startDeg; deg <= endDeg; deg += 3) {
-            float rad = deg * 0.01745f;
-            int x = cx + (int)(rx * cosf(rad));
-            int y = cy + (int)(ry * sinf(rad));
-            _spr.fillCircle(x, y, 4, C_MOUTH);
-        }
-    }
+    TFT_eSPI& _tft;
+    Expression _lastExpr;
+    bool _lastBlink;
+    uint32_t _lastTick;
+    bool _forceRedraw;
 };

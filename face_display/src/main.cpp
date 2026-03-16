@@ -28,9 +28,10 @@
 #include "faces.h"
 
 // ── Display + sprite ──────────────────────────────────────────────────────────
-TFT_eSPI    tft;
-TFT_eSprite sprite(&tft);
-FaceRenderer renderer(sprite);
+// Declared as pointers to avoid global construction before system init
+static TFT_eSPI*    tft     = nullptr;
+static TFT_eSprite* sprite  = nullptr;
+static FaceRenderer* renderer = nullptr;
 
 // ── State ─────────────────────────────────────────────────────────────────────
 Expression  currentExpr    = EXPR_IDLE;
@@ -141,30 +142,36 @@ void updateExprState() {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  Setup
-// ─────────────────────────────────────────────────────────────────────────────
+// ── Setup ─────────────────────────────────────────────────────────────────────
 void setup() {
     Serial.begin(115200);
-    // Short delay so USB CDC is ready on ESP32-S3
-    delay(500);
+    delay(2000); // 2 sec delay so USB CDC has time to connect on S3
 
-    tft.init();
-    tft.setRotation(0);          // portrait, USB at bottom
-    tft.fillScreen(C_BG);
-    tft.setSwapBytes(true);
+    Serial.println("INIT: Starting display diagnostics...");
 
-    // 16-bit colour sprite (full screen buffer)
-    sprite.setColorDepth(16);
-    sprite.createSprite(240, 320);
+    tft = new TFT_eSPI();
+    tft->init();
+    tft->setRotation(0);
+    
+    // Cycle RGB to test display wiring and ST7789 behavior
+    tft->fillScreen(TFT_RED);
+    delay(1000);
+    tft->fillScreen(TFT_GREEN);
+    delay(1000);
+    tft->fillScreen(TFT_BLUE);
+    delay(1000);
+    
+    tft->fillScreen(C_BG);
+    tft->setSwapBytes(true);
 
-    Serial.println("SO-101 face display ready.");
+    // Pass the TFT screen itself directly to the renderer to save 153KB of SRAM
+    renderer = new FaceRenderer(*tft);
+
+    Serial.println("SO-101 face display ready. DIAGNOSTICS COMPLETE.");
     Serial.println("Commands: FACE:IDLE  FACE:HAPPY  FACE:SAD  FACE:BLINK  FACE:TALK");
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  Main loop
-// ─────────────────────────────────────────────────────────────────────────────
+// ── Main loop ─────────────────────────────────────────────────────────────────
 void loop() {
     readSerial();
 
@@ -174,8 +181,9 @@ void loop() {
         updateExprState();
 
         bool autoBlinking = (currentExpr == EXPR_IDLE && blinkFramesLeft > 0);
-        renderer.draw(currentExpr, animTick, autoBlinking);
-        sprite.pushSprite(0, 0);
+        
+        // Draw directly to the hardware display without a RAM buffer
+        renderer->draw(currentExpr, animTick, autoBlinking);
 
         animTick++;
     }
