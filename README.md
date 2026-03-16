@@ -104,7 +104,9 @@ python3 calibrate_servo.py
 
 ## Face Display (`face_display/`)
 
-ESP32-S3 SuperMini + 2.0" ST7789V 240x320 SPI TFT. Receives serial commands from the LeRobot controller and shows animated expressions.
+ESP32-S3 SuperMini + 2.0" ST7789V 240x320 SPI TFT. Receives serial commands from the LeRobot controller and shows animated retro ASCII Kaomoji expressions.
+
+*(Note: The face rendering utilizes a custom differential screen-wipe bypass directly addressing `TFT_eSPI` to stop the ESP32-S3 from crashing due to memory fragmentation.)*
 
 ### Wiring
 
@@ -124,20 +126,21 @@ ESP32-S3 SuperMini + 2.0" ST7789V 240x320 SPI TFT. Receives serial commands from
 ```bash
 pip install platformio
 cd face_display
-# set upload_port in platformio.ini, or run ../find_port.sh
+# set upload_port in platformio.ini (e.g., /dev/ttyACM0)
 pio run -t upload
 pio device monitor
 ```
 
 ### Commands (115200 baud)
 
+Send over serial to trigger the color-coded ASCII expressions:
 `FACE:IDLE` `FACE:HAPPY` `FACE:SAD` `FACE:BLINK` `FACE:TALK`
 
 ### Python
 
 ```python
 import serial
-face = serial.Serial('/dev/ttyUSB1', 115200, timeout=1)
+face = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
 face.write(b"FACE:HAPPY\n")
 ```
 
