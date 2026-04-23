@@ -24,9 +24,13 @@ Personal build notes / tooling for the SO-101 robot arm (leader + follower) usin
 
 ## Key architectural facts
 
-- **This repo does NOT contain or install LeRobot.** LeRobot is a separate project. The Python scripts import from `lerobot.motors.feetech` and require `lerobot` to be installed in the active environment (typically via `pip install -e ".[feetech]"` inside the LeRobot repo).
+- **LeRobot lives in `/home/gs/projects/github/lerobot` and is installed via a `conda` environment named `lerobot`.** Before running any LeRobot CLI, activate it:
+  ```bash
+  conda activate lerobot
+  ```
 - **USB serial:** Linux users need `/dev/ttyACM0` access. Run once: `sudo usermod -aG dialout $USER` (requires re-login), or `sudo chmod 666 /dev/ttyACM0` for a temporary fix.
-- **Port discovery:** `find_port.sh` snapshots ports before/after plugging a device; supports updating `face_display/platformio.ini` in-place.
+- **Port discovery:** `lerobot-find-port` identifies which arm is on which port. If unsure, run `find_port.sh` (snapshots ports before/after plugging in a device).
+- **Robot IDs used in this repo:** follower is `purple_bot`, leader is `yellow_bot`.
 
 ## Tooling commands
 
@@ -35,9 +39,9 @@ Personal build notes / tooling for the SO-101 robot arm (leader + follower) usin
 | Find LeRobot motor bus ports | `lerobot-find-port` |
 | Set motor IDs (follower) | `lerobot-setup-motors --robot.type=so101_follower --robot.port=/dev/ttyACM0` |
 | Set motor IDs (leader) | `lerobot-setup-motors --teleop.type=so101_leader --teleop.port=/dev/ttyACM0` |
-| Calibrate (follower) | `lerobot-calibrate --robot.type=so101_follower --robot.port=/dev/ttyACM0 --robot.id=my_follower_arm` |
-| Calibrate (leader) | `lerobot-calibrate --teleop.type=so101_leader --teleop.port=/dev/ttyACM0 --teleop.id=my_leader_arm` |
-| Teleoperate | `lerobot-teleoperate --robot.type=so101_follower --robot.port=/dev/ttyACM1 --robot.id=my_follower_arm --teleop.type=so101_leader --teleop.port=/dev/ttyACM0 --teleop.id=my_leader_arm` |
+| Calibrate (follower) | `lerobot-calibrate --robot.type=so101_follower --robot.port=/dev/ttyACM0 --robot.id=purple_bot` |
+| Calibrate (leader) | `lerobot-calibrate --teleop.type=so101_leader --teleop.port=/dev/ttyACM0 --teleop.id=yellow_bot` |
+| Teleoperate | `lerobot-teleoperate --robot.type=so101_follower --robot.port=/dev/ttyACM1 --robot.id=purple_bot --teleop.type=so101_leader --teleop.port=/dev/ttyACM0 --teleop.id=yellow_bot` |
 | Flash face display | `cd face_display && pio run -t upload` |
 | Rebuild single STL from OpenSCAD | `openscad -o shell.stl -D 'PART="shell"' face_display/cad/face_enclosure.scad` |
 | Regenerate build plate | `python3 face_display/cad/generate_build_plate.py` |
@@ -73,7 +77,7 @@ These must be edited to match the actual connected motor before use.
 
 ## Common pitfalls
 
-1. **LeRobot not installed** → `ModuleNotFoundError: lerobot`. Solution: install LeRobot in the active Python environment.
+1. **LeRobot not installed** → `ModuleNotFoundError: lerobot`. Solution: `conda activate lerobot`.
 2. **USB permission denied** → `PermissionError: [Errno 13] /dev/ttyACM0`. Solution: add user to `dialout` group or `chmod 666`.
 3. **Face display upload fails** → wrong `upload_port` in `platformio.ini`. Solution: run `./find_port.sh` and let it patch the `platformio.ini`.
 4. **OpenSCAD not on PATH** → `generate_build_plate.py` fails. Solution: `apt install openscad`.

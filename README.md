@@ -14,7 +14,18 @@ Build notes and tooling for the [SO-101 robot arm](https://github.com/TheRobotSt
 
 ### 1. Install LeRobot
 
+LeRobot lives in `/home/gs/projects/github/lerobot` and is installed via a **conda** environment named `lerobot`.
+
+Activate it before running any LeRobot CLI:
+
 ```bash
+conda activate lerobot
+```
+
+Then install (one-time):
+
+```bash
+cd /home/gs/projects/github/lerobot
 pip install -e ".[feetech]"
 ```
 
@@ -62,10 +73,10 @@ Motor IDs assigned (same for both arms):
 
 ```bash
 # Follower (uses --robot.*)
-lerobot-calibrate --robot.type=so101_follower --robot.port=/dev/ttyACM0 --robot.id=my_follower_arm
+lerobot-calibrate --robot.type=so101_follower --robot.port=/dev/ttyACM0 --robot.id=purple_bot
 
 # Leader (uses --teleop.*)
-lerobot-calibrate --teleop.type=so101_leader --teleop.port=/dev/ttyACM0 --teleop.id=my_leader_arm
+lerobot-calibrate --teleop.type=so101_leader --teleop.port=/dev/ttyACM0 --teleop.id=yellow_bot
 ```
 
 During calibration: move all joints through their full range except `wrist_roll`, which is a continuous rotation joint.
@@ -76,8 +87,8 @@ Run `lerobot-find-port` with each arm plugged in separately to confirm which por
 
 ```bash
 lerobot-teleoperate \
-  --robot.type=so101_follower --robot.port=/dev/ttyACM1 --robot.id=my_follower_arm \
-  --teleop.type=so101_leader  --teleop.port=/dev/ttyACM0 --teleop.id=my_leader_arm
+  --robot.type=so101_follower --robot.port=/dev/ttyACM1 --robot.id=purple_bot \
+  --teleop.type=so101_leader  --teleop.port=/dev/ttyACM0 --teleop.id=yellow_bot
 ```
 
 If you see a calibration mismatch prompt on startup, press Enter to load the saved calibration file.
