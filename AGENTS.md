@@ -69,6 +69,10 @@ These must be edited to match the actual connected motor before use.
   - `WIRE_GAP = 10.0` — slack space between display and ESP32 protoboard
 - `generate_build_plate.py` uses `openscad` CLI to render `build_plate.stl`. Requires OpenSCAD on PATH.
 
+## Imitation Learning
+
+For the full LeRobot IL pipeline (record → train ACT → evaluate) with camera setup, see [`IL_WORKFLOW.md`](IL_WORKFLOW.md).
+
 ## Conventions
 
 - Commit messages follow the repo's style: `{Add,Fix,Update} <short description>`

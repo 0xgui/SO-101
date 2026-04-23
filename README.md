@@ -93,6 +93,16 @@ lerobot-teleoperate \
 
 If you see a calibration mismatch prompt on startup, press Enter to load the saved calibration file.
 
+---
+
+## Imitation Learning
+
+This repository also documents the full LeRobot imitation-learning pipeline (record, train, evaluate) for the SO-101.
+
+See [`IL_WORKFLOW.md`](IL_WORKFLOW.md) for the complete step-by-step guide, including camera setup, dataset recording, ACT policy training, and autonomous evaluation.
+
+If you encounter PyTorch CUDA errors with newer GPUs (e.g., RTX 5070 Ti), the IL guide includes the CUDA 12.8 / Python 3.12 setup steps.
+
 ## Scripts
 
 ### `test_servo.py`
