@@ -10,11 +10,11 @@ Three parts are laid out left-to-right with 5 mm spacing between them:
 
 | Part     | Position | Dimensions (×)       | Print settings              |
 |----------|----------|----------------------|-----------------------------|
-| **Shell** | Left     | 54.4 × 74.4 × 23.7 mm | No supports, face-down      |
+| **Shell** | Left     | 54.4 × 74.4 × 26.2 mm | No supports, face-down      |
 | **Lid**   | Center   | 54.4 × 74.4 × 8.0 mm  | No supports, flat-side down |
-| **Mount** | Right    | 118.8 × 42.0 × 105.9 mm | No supports, flat-side down |
+| **Mount** | Right    | 100.0 × 92.0 × 4.6 mm | No supports, flat-side down |
 
-**Build plate footprint:** ~238 × 75 mm  
+**Build plate footprint:** ~219 × 92 mm  
 Fits on any 250×250 mm bed (e.g., Bambu A1, Prusa MK4, etc.).
 
 ---

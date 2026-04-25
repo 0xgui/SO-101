@@ -7,19 +7,19 @@
 Three parts to print + hardware:
 
 ```
-                    SHELL                          LID                    MOUNT BRACKET
+                    SHELL                          LID                   STRAP MOUNT
          (front view, bezel side)          (back view)                 (front view)
 
-    ┌─────────────────────────┐      ┌─────────────────────────┐   ╔═══╦═════════════╦═══╗
-    │  ┌───────────────────┐  │      │  ●               ●  │  │   ║   ║             ║   ║
-    │  │   bezel window    │  │      │  │  (M3 boss cols)│  │  │   ║   ║  face plate ║   ║
-    │  │  (screen shows    │  │      │  │                │  │  │   ║   ║  (display   ║   ║
-    │  │   through here)   │  │      │  │                │  │  │   ║   ║   box bolts ║   ║
-    │  └───────────────────┘  │      │  │                │  │  │   ║   ║   here)     ║   ║
-    │                         │      │  ●               ●  │  │   ║   ║             ║   ║
-    │  [USB-C slot on bottom] │      └─────────────────────────┘   ║   ║  ● holes ● ║   ║
-    └─────────────────────────┘                                     ╚═══╩═════════════╩═══╝
-                                           ↑ snap rails on inside        ↑ wide U-hook on top
+    ┌─────────────────────────┐      ┌─────────────────────────┐   ┌──────────────────────┐
+    │  ┌───────────────────┐  │      │  ●               ●  │  │   │  ║              ║    │
+    │  │   bezel window    │  │      │  │  (M3 boss cols)│  │  │   │  ║  strap slots ║    │
+    │  │  (screen shows    │  │      │  │                │  │  │   │  ║              ║    │
+    │  │   through here)   │  │      │  │                │  │  │   │    ○        ○        │
+    │  └───────────────────┘  │      │  │                │  │  │   │                      │
+    │                         │      │  ●               ●  │  │   │    ○        ○        │
+    │  [USB-C slot on bottom] │      └─────────────────────────┘   │  ║              ║    │
+    └─────────────────────────┘                                    └──────────────────────┘
+                                           ↑ snap rails on inside       ↑ zip ties pass here
 ```
 
 ---
@@ -39,14 +39,14 @@ Three parts to print + hardware:
     Side cross-section (what's inside, front → back):
 
     FRONT                                              BACK
-      │← 2mm →│← 1.6mm →│←── 10mm ──→│← 2mm →│← 1.6mm →│← 4.5mm →│← 2mm →│
+      │← 2mm →│← 1.6mm →│←── 10mm ──→│← 2mm →│← 1.6mm →│← 7.0mm →│← 2mm →│
       │  wall  │ display  │ wire slack  │standof│protoboard│  ESP32  │margin │
-      │        │   PCB    │  (jumpers   │  pegs │          │ chips   │       │
+      │        │   PCB    │  (jumpers   │ledges │          │ chips   │       │
       │[window]│[screen→] │  loop here) │       │[ESP32-S3]│         │       │
       │        │          │             │       │          │         │       │
     ══╪════════╪══════════╪═════════════╪═══════╪══════════╪═════════╪═══════╪══
-      z=0    z=2        z=3.6       z=13.6  z=15.6     z=17.2    z=21.7  z=23.7
-                                                                      (BOX_D total ~24mm)
+      z=0    z=2        z=3.6       z=13.6  z=15.6     z=17.2    z=24.2  z=26.2
+                                                                      (BOX_D total ~26mm)
 ```
 
 ---
@@ -55,9 +55,9 @@ Three parts to print + hardware:
 
 | Item | Qty | Purpose |
 |------|-----|---------|
-| M3 heat-set inserts | 8 | 4 in lid boss columns + 4 in mount face plate |
-| M3×8 mm bolts | 8 | Lid → mount bracket |
-| M3×12 mm bolts | 2 | Hook tightening screws (lock bracket to arm) |
+| M3 heat-set inserts | 4 | Lid boss columns |
+| M3×8 mm bolts | 4 | Lid → mount bracket |
+| Long zip ties | 2 | Strap mount around the top arm / upper link |
 | Jumper wires ~8 cm | 8 | Display PCB → protoboard |
 | Soldering iron (220 °C) | 1 | Installing heat-set inserts |
 
@@ -66,22 +66,23 @@ Three parts to print + hardware:
 ## Step 1 — Install heat-set inserts
 
 Use a soldering iron at ~220 °C. Press each insert flush or just below the surface.
+Only the lid gets heat-set inserts. The mount bracket has clearance holes.
 
 ```
-    LID (back face up):                    MOUNT BRACKET (front face up):
+    LID (back face up):
 
-    ┌─────────────────────────┐            ┌─────────────────────────┐
-    │  ╔══╗           ╔══╗   │            │   ╔══╗           ╔══╗   │
-    │  ║██║  boss     ║██║   │            │   ║██║  boss     ║██║   │
-    │  ║██║  columns  ║██║   │            │   ║██║  columns  ║██║   │
-    │  ╚══╝ (4 total) ╚══╝   │            │   ╚══╝ (4 total) ╚══╝   │
-    │                         │            │                         │
-    │  ╔══╗           ╔══╗   │            │   ╔══╗           ╔══╗   │
-    │  ║██║           ║██║   │            │   ║██║           ║██║   │
-    │  ╚══╝           ╚══╝   │            │   ╚══╝           ╚══╝   │
-    └─────────────────────────┘            └─────────────────────────┘
-          ↓ press inserts in                     ↓ press inserts in
-         with soldering iron                    with soldering iron
+    ┌─────────────────────────┐
+    │  ╔══╗           ╔══╗   │
+    │  ║██║  boss     ║██║   │
+    │  ║██║  columns  ║██║   │
+    │  ╚══╝ (4 total) ╚══╝   │
+    │                         │
+    │  ╔══╗           ╔══╗   │
+    │  ║██║           ║██║   │
+    │  ╚══╝           ╚══╝   │
+    └─────────────────────────┘
+          ↓ press inserts in
+         with soldering iron
 ```
 
 ---
@@ -155,8 +156,8 @@ Hold the shell with the **open back facing up** and the bezel window facing down
 
     ╔════════════════════════════╗  ← open back (you load from here)
     ║                            ║
-    ║  4. protoboard + ESP32     ║  ← sits on 4 corner standoff pegs
-    ║  ···························  ← standoff pegs (2 mm tall)
+    ║  4. protoboard + ESP32     ║  ← sits on side support ledges
+    ║  ···························  ← ledges tied into shell walls
     ║  ·· wire slack zone ·······  ← 10 mm air gap, wires loop here
     ║  ···························
     ║  3. display PCB             ║  ← rests on inner ledge lip, screen down
@@ -170,7 +171,7 @@ Hold the shell with the **open back facing up** and the bezel window facing down
        — it rests on the inner ledge lip
     c) Feed jumper wires into the cavity
     d) Lower protoboard in, component-side UP
-       — 4 corner pegs locate it automatically
+       — side ledges support the board edges
        — USB-C end faces the bottom wall slot
     e) Check USB-C aligns with the slot on the bottom wall
 ```
@@ -218,103 +219,99 @@ Hold the shell with the **open back facing up** and the bezel window facing down
 
 ## Step 6 — Bolt lid to mount bracket
 
-```
-    Exploded view (side):
+The lid and mount are two separate printed parts:
 
-    ┌──────────────────────────┐  ← shell (display inside)
+- The **lid** has four raised boss columns. Install heat-set inserts into those bosses.
+- The **mount** is the large flat strap plate. Its four center holes are through-holes.
+- The **M3 bolt heads sit on the arm side of the mount**.
+- The bolts pass through the mount and thread into the inserts in the lid.
+
+```
+    Exploded view (side, before tightening):
+
+    ARM SIDE / ZIP TIE SIDE
+              ↓
+    ┌──────────────────────────┐
+    │      STRAP MOUNT         │  ← bolt heads sit in this face
+    │    ○              ○      │
+    └──────────┬────┬──────────┘
+               │M3×8│
+               │bolt│  passes through mount
+    ┌──────────▼────▼──────────┐
+    │          LID             │  ← heat-set inserts are in these bosses
+    │      ●            ●      │
     └──────────────────────────┘
-    ┌──────────────────────────┐  ← lid (snap rails face into shell)
-    │  ●    ●    ●    ●       │    boss columns point outward
+       snap rails point into shell
+    ┌──────────────────────────┐
+    │          SHELL           │  ← display/protoboard inside
     └──────────────────────────┘
-           ↕ M3×8 mm bolts (8×)
-    ┌──────────────────────────┐  ← mount bracket face plate
-    │  ○    ○    ○    ○       │    holes align with lid boss inserts
-    └──────────────────────────┘
+              ↓
+    SCREEN SIDE / OUTWARD SIDE
 ```
 
-Drive 8× M3×8 mm bolts through the mount face plate into the lid boss inserts.
+Drive 4× M3×8 mm bolts through the strap mount into the lid boss inserts. After
+that, snap the lid onto the shell.
 
 ---
 
-## Step 7 — Mount on the SO-101 arm
+## Step 7 — Mount on the SO-101 top arm
 
-The mount bracket is a **U-hook** that slides over the top edge of the SO-101 base.
+This mount is for the **top arm / upper link**: the long slanted purple link
+between the shoulder and elbow in the photo. Do not put the face on the gripper.
+Do not use the old base hook unless you intentionally render `base_mount`.
 
-```
-    Side view of mount + arm (cross-section):
-
-         FRONT                      BACK
-           │                          │
-    ───────┤← face plate (3.5 mm) ───┤
-           │  [display box bolted     │
-           │   here on front]         │
-    ───────┤                          │
-           │  ┌────────────────────┐  │
-           │  │  hook front arm    │  │  ← 18 mm tall
-           │  │  (3.5 mm thick)   │  │
-    ═══════╪══╧══════════╤═════════╧══╪══  ← top cap (bridges 35 mm)
-           │             │            │
-           │             │            │  ← hook back arm (18 mm tall)
-           │   SO-101    │            │
-           │   base      │            │
-           │   (arm      │            │
-           │   body      │            │
-           │   here)     │            │
-           │             │            │
-
-    Bracket width = 119 mm (arm is 111 mm wide — 4 mm clearance each side)
-    Hook depth    =  35 mm into the arm from front
-    Hook grip     =  18 mm down each side from the top cap
-
-    HOW TO INSTALL:
-    a) Hold bracket above arm base, hook opening facing DOWN
-    b) Lower onto arm — hook slides over the top edge
-    c) Push down until hook arms sit 18 mm below the arm top surface
-    d) Thread 2× M3×12 mm bolts through the two holes in the
-       hook FRONT ARM — tighten until they press against the
-       arm's front face and the bracket cannot slide up
-```
+Open `top_arm_fit_preview.png` first if the location is unclear. It shows the
+top arm in purple, the strap mount in amber, the face box in green, and the two
+black straps wrapping around the upper link.
 
 ```
-    Front view — bracket on arm:
+    VIEWED FROM THE SIDE OF THE TOP ARM
 
-    ┌───────────────────────────────────────────┐  ← top cap (above arm top)
-    │                                           │
-    ╠═════════╦═════════════════════╦═════════╣  ← hook front arm
-    │         │                     │         │    (2× M3 bolts here → ●  ●)
-    │         │   SO-101 base top   │         │
-    │         │   (arm body here)   │         │
-    │         │                     │         │
-    ╠═════════╩═════════════════════╩═════════╣  ← hook bottom (18 mm below cap)
-    │                                         │
-    │         face plate (display box         │
-    │         bolts to this surface)          │
-    │                                         │
-    │         ●           ●                   │  ← M3 boss holes
-    │                                         │
-    │         ●           ●                   │
-    │                                         │
-    └─────────────────────────────────────────┘
+    ┌──────────────────────────────────────────────┐
+    │              SO-101 top arm link             │
+    └──────────────────────────────────────────────┘
+          │                                  │
+          │                                  │
+          │                                  │
+      zip tie                            zip tie
+          │                                  │
+    ┌─────┴──────────────────────────────────┴─────┐
+    │              strap mount plate                │
+    │       ○                              ○        │
+    │                                                │
+    │       ○                              ○        │
+    └────────────────────────────────────────────────┘
+                    │  M3×8 bolts into lid
+                    ↓
+             ┌──────────────────┐
+             │   face display   │  ← screen faces outward
+             └──────────────────┘
 ```
+
+How to install:
+
+1. Bolt the strap mount plate to the lid using 4× M3×8 bolts.
+2. Snap the lid onto the face display shell.
+3. Hold the face against the outside face of the top arm / upper link.
+4. Feed one long zip tie through the left upper/lower slot pair and around the arm link.
+5. Feed the second long zip tie through the right upper/lower slot pair and around the arm link.
+6. Tighten both zip ties until the face cannot slide, but do not crush the printed arm.
 
 ---
 
 ## Final assembly exploded diagram
 
 ```
-                        ╔══════════╗
-                        ║  SO-101  ║
-                        ║   arm    ║
-                        ║  base    ║
-                        ╚══════════╝
-                             ↑
-                    slides up into hook
-                             │
-    ╔══╦═══════════════════╦══╗   ← MOUNT BRACKET
-    ║  ║   hook (U-shape)  ║  ║     (119mm wide)
-    ╠══╩═══════════════════╩══╣
-    │      face plate         │
-    │   ○  ○  ○  ○            │   ← M3×8 bolts (8×) ↕
+    ┌─────────────────────────┐
+    │  SO-101 top arm link    │   ← zip ties wrap around this link
+    └─────────────────────────┘
+          ↑             ↑
+          │             │
+       zip tie       zip tie
+          │             │
+    ┌─────────────────────────┐
+    │   STRAP MOUNT PLATE     │
+    │   ○  ○  ○  ○            │   ← M3×8 bolts (4×) ↕
     └─────────────────────────┘
     ┌─────────────────────────┐
     │   ●  ●  ●  ●            │   ← LID (heat-set inserts in bosses)
@@ -324,7 +321,7 @@ The mount bracket is a **U-hook** that slides over the top edge of the SO-101 ba
     ┌─────────────────────────┐
     │   ┌─────────────────┐   │   ← SHELL
     │   │  protoboard     │   │     inner cavity:
-    │   │  [ESP32-S3]     │   │     • protoboard on pegs
+    │   │  [ESP32-S3]     │   │     • protoboard on side ledges
     │   └─────────────────┘   │     • wire gap below
     │   ↕ 8× jumper wires     │     • display PCB at front
     │   ┌─────────────────┐   │
@@ -343,13 +340,14 @@ The mount bracket is a **U-hook** that slides over the top edge of the SO-101 ba
 
 | Problem | Fix in `face_enclosure.scad` |
 |---------|------------------------------|
-| Hook too tight on arm | `HOOK_CLEARANCE` 0.4 → 0.8, re-render `mount.stl` |
-| Hook too loose | `HOOK_CLEARANCE` 0.4 → 0.1, re-render `mount.stl` |
+| Zip ties do not fit slots | Increase `STRAP_SLOT_W`, re-render `mount.stl` |
+| Face slides on top arm | Add thin rubber tape between mount and arm, or tighten zip ties |
+| Mount plate is too large | Reduce `STRAP_PLATE_W` / `STRAP_PLATE_H`, re-render `mount.stl` |
 | Display PCB too tight in shell | `tol` 0.2 → 0.3, re-render `shell.stl` |
 | Display PCB too loose | `tol` 0.2 → 0.1, re-render `shell.stl` |
 | Wires too cramped | `WIRE_GAP` 10 → 15, re-render `shell.stl` + `lid.stl` |
 | Lid won't snap closed | Sand the snap rails lightly |
-| USB-C slot wrong height | Measure your actual setup, adjust `E_T` in scad |
+| USB-C slot wrong height | Measure your actual flat-soldered stack, adjust `E_T` in scad |
 
 ---
 

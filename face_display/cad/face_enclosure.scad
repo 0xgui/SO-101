@@ -6,7 +6,7 @@
 //  PRINT ORIENTATION
 //    shell → face-down on plate (bezel face against bed)
 //    lid   → flat-side down
-//    mount → flat-side down
+//    mount → face-plate down
 //
 //  RENDER EACH PART:
 //    1. Set PART = "shell" → F6 → File > Export > STL
@@ -15,12 +15,12 @@
 //    (PART = "all" shows an exploded preview)
 //
 //  HARDWARE:
-//    Display : 2.0" ST7789V 240×320 TFT, PCB ~42×60 mm
+//    Display : 2.0" ST7789V 240×320 TFT, PCB 50×70 mm
 //    MCU     : ESP32-S3 SuperMini, PCB ~22.5×18 mm
 //    Arm     : SO-ARM100 / SO-101
 // ============================================================
 
-PART = "shell";  // "shell" | "lid" | "mount" | "all"
+PART = "shell";  // "shell" | "lid" | "mount" | "base_mount" | "all"
 
 /* ---- Tolerances ----------------------------------------- */
 tol = 0.2;   // general clearance added to female dimensions
@@ -43,7 +43,7 @@ PIN_ZONE_H = 12.0;  // height of the pin zone at the bottom of the PCB
 PIN_Z      =  4.5;  // how far pins protrude behind PCB back face
 
 /* ---- ESP32-S3 SuperMini (mounted on protoboard) --------- */
-E_T   =  4.5;   // tallest component height above protoboard surface
+E_T   =  7.0;   // flat-soldered ESP32 stack height above protoboard surface
 USB_W = 10.0;
 USB_H =  4.0;
 
@@ -81,18 +81,32 @@ SNAP_W = 2.5;   // snap rail width (printed on lid, fits slot in shell)
 SNAP_H = 6.0;   // snap rail height
 SNAP_HOOK = 0.7;// hook undercut depth
 
-/* ---- Arm mount bracket ---------------------------------- */
-// Top-hook clamp — slides over the top edge of the SO-101 base.
+/* ---- Strap mount bracket -------------------------------- */
+// Main printable mount for the arm shown in the repo photos.
+// The display box bolts to the center holes, then two zip ties or hook-and-loop
+// straps pass through the side slots and around a visible arm link.
+STRAP_PLATE_W = 100.0;
+STRAP_PLATE_H =  92.0;
+STRAP_PLATE_T =   4.0;
+STRAP_SLOT_W  =   6.0;
+STRAP_SLOT_H  =  24.0;
+STRAP_SLOT_X  =  40.0;
+STRAP_SLOT_Y  =  26.0;
+STRAP_HEAD_D  =   6.6;  // M3 socket head clearance on arm side
+STRAP_HEAD_H  =   2.5;
+
+/* ---- Legacy base mount bracket -------------------------- */
+// Top-hook clamp — slides over the raised top edge of the SO-101 base.
 // Two M3 tightening screws through the front arm lock it in place.
 //
-// SO-101 base measured from STL:
-//   Width : 110.9 mm
-//   Height:  87.0 mm  (we grip the top 18 mm)
+// Official Base_SO101.stl measurements:
+//   Overall base: 110.925 W × 72.0 D × 87.0 H mm
+//   Top 18 mm grip zone: ~82.4 W × 17.5 D mm
 //
-ARM_BASE_W     = 111.0;  // base width  (X)
+ARM_TOP_W      =  82.4;  // raised top section width (X)
+ARM_TOP_D      =  17.5;  // raised top section depth (Y)
 HOOK_WALL      =   3.5;  // all wall thickness
 HOOK_GRIP      =  18.0;  // how far the arms extend downward from the cap
-HOOK_DEPTH     =  35.0;  // front-to-back hook depth (35 mm bridges fine, no supports)
 HOOK_CLEARANCE =   0.4;  // slip fit clearance each side
 
 // Inner screw pattern: attaches to lid bosses (display box back)
@@ -104,8 +118,10 @@ MH_D       =  3.3;  // M3 clearance hole
 CLAMP_SCREW_D = 3.3;
 
 // Derived
-HOOK_INNER_W = ARM_BASE_W + 2*HOOK_CLEARANCE;  // 111.8 mm
-HOOK_OUTER_W = HOOK_INNER_W + 2*HOOK_WALL;     // 118.8 mm
+HOOK_INNER_W = ARM_TOP_W + 2*HOOK_CLEARANCE;  // 83.2 mm
+HOOK_INNER_D = ARM_TOP_D + 2*HOOK_CLEARANCE;  // 18.3 mm
+HOOK_OUTER_W = HOOK_INNER_W + 2*HOOK_WALL;    // 90.2 mm
+HOOK_OUTER_D = HOOK_INNER_D + 2*HOOK_WALL;    // 25.3 mm
 
 // ============================================================
 //  HELPERS
@@ -179,16 +195,18 @@ module shell() {
             cube([VW + 2, VH + 2, D_T + 2], center=true);
     }
 
-    // ── Protoboard standoff pegs ─────────────────────────────
-    // 4 corner pegs the 50×70 mm protoboard rests on.
-    // Protoboard front face sits at z = WALL + D_T + WIRE_GAP + PB_SO
-    peg_r  = 2.0;
-    peg_z  = WALL + D_T + WIRE_GAP;
-    peg_h  = PB_SO;
-    pb_inset = 3.0;   // peg center inset from protoboard edge
+    // ── Protoboard support ledges ────────────────────────────
+    // The previous peg version created disconnected "floating islands" in
+    // slicers. These ledges are tied into the side walls and support the
+    // protoboard edges at the same height.
+    ledge_w = 2.0;
+    ledge_l = 14.0;
+    ledge_z = WALL + D_T + 0.6;
+    ledge_h = WIRE_GAP + PB_SO - 0.6;
+    ledge_y = PB_H/2 - 10.0;
     for (sx=[-1,1], sy=[-1,1])
-        translate([sx*(PB_W/2 - pb_inset), sy*(PB_H/2 - pb_inset), peg_z])
-            cylinder(r=peg_r, h=peg_h, $fn=16);
+        translate([sx*(INNER_W/2 - ledge_w/2), sy*ledge_y, ledge_z + ledge_h/2])
+            cube([ledge_w, ledge_l, ledge_h], center=true);
 }
 
 // ============================================================
@@ -264,12 +282,12 @@ module lid() {
 //    │     │  attaches here │
 //    └─────────────────────────── Y
 //
-//  HW = HOOK_WALL, HD = HOOK_DEPTH
+//  HW = HOOK_WALL, HD = HOOK_INNER_D
 //
 //  Print orientation: face plate face-down on bed.
-//  The 35mm bridge (top cap inner span) prints fine on A1 without supports.
+//  The 18.3mm bridge (top cap inner span) prints fine on A1 without supports.
 
-module mount() {
+module base_mount() {
     face_w = BOX_W + 10;    // face plate width (display box + margin = ~64 mm)
     face_h = BOX_H + 10;    // face plate height (~84 mm)
 
@@ -288,17 +306,17 @@ module mount() {
 
             // ── hook top cap ──────────────────────────────────
             // Bridges front arm to back arm
-            // Y: 0 → HOOK_WALL+HOOK_DEPTH+HOOK_WALL,  Z: face_h+HOOK_GRIP → +HOOK_WALL
+            // Y: 0 → HOOK_OUTER_D,  Z: face_h+HOOK_GRIP → +HOOK_WALL
             translate([-HOOK_OUTER_W/2, 0, face_h + HOOK_GRIP])
                 cube([HOOK_OUTER_W,
-                      HOOK_WALL + HOOK_DEPTH + HOOK_WALL,
+                      HOOK_OUTER_D,
                       HOOK_WALL]);
 
             // ── hook back arm ─────────────────────────────────
             // Hangs from back edge of top cap
-            // Y: HOOK_WALL+HOOK_DEPTH → +HOOK_WALL,  Z: face_h → face_h+HOOK_GRIP
+            // Y: HOOK_WALL+HOOK_INNER_D → +HOOK_WALL,  Z: face_h → face_h+HOOK_GRIP
             translate([-HOOK_OUTER_W/2,
-                       HOOK_WALL + HOOK_DEPTH,
+                       HOOK_WALL + HOOK_INNER_D,
                        face_h])
                 cube([HOOK_OUTER_W, HOOK_WALL, HOOK_GRIP]);
         }
@@ -319,6 +337,50 @@ module mount() {
     }
 }
 
+module base_mount_print() {
+    // Lay the face plate on the print bed. In assembly coordinates the
+    // bracket is vertical; print coordinates rotate the height into Y.
+    face_h = BOX_H + 10;
+    translate([0, face_h + HOOK_GRIP + HOOK_WALL, 0])
+        rotate([90, 0, 0])
+            base_mount();
+}
+
+module rounded_slot(w, h, d) {
+    hull()
+        for (sy=[-1,1])
+            translate([0, sy*(h/2 - w/2), 0])
+                cylinder(d=w, h=d, $fn=24);
+}
+
+module strap_mount() {
+    difference() {
+        // Wide flat plate: side wings keep strap slots accessible after the
+        // display box is bolted on.
+        rbox(STRAP_PLATE_W, STRAP_PLATE_H, STRAP_PLATE_T, r=3.0);
+
+        // M3 bolts pass through the mount into the lid heat-set inserts.
+        for (sx=[-1,1], sy=[-1,1])
+            translate([sx*LID_BOSS_X/2, sy*LID_BOSS_Y/2, -0.1]) {
+                cylinder(d=MH_D, h=STRAP_PLATE_T + 0.2, $fn=24);
+                cylinder(d=STRAP_HEAD_D, h=STRAP_HEAD_H + 0.1, $fn=24);
+            }
+
+        // Two straps: one on the left wing and one on the right wing. Each
+        // strap uses the upper/lower slot pair, wraps around the arm link,
+        // then tightens on itself.
+        for (sx=[-1,1], sy=[-1,1])
+            translate([sx*STRAP_SLOT_X, sy*STRAP_SLOT_Y, -0.1])
+                rounded_slot(STRAP_SLOT_W, STRAP_SLOT_H, STRAP_PLATE_T + 0.2);
+    }
+
+    // Low back rails help the plate resist twisting on a printed arm link.
+    // They are shallow enough to sand flat if your preferred location is curved.
+    for (sy=[-1,1])
+        translate([0, sy*34, STRAP_PLATE_T])
+            cube([62, 2.0, 1.2], center=true);
+}
+
 // ============================================================
 //  RENDER
 // ============================================================
@@ -333,11 +395,14 @@ else if (PART == "lid") {
             lid();
 }
 else if (PART == "mount") {
-    mount();
+    strap_mount();
+}
+else if (PART == "base_mount") {
+    base_mount_print();
 }
 else if (PART == "all") {
     // Exploded assembly preview
     color("SteelBlue")   shell();
     color("SlateGray", 0.85) translate([0, 0, BOX_D + 8]) lid();
-    color("DimGray")     translate([BOX_W + 15, 0, 0]) mount();
+    color("DimGray")     translate([BOX_W + 15, 0, 0]) strap_mount();
 }
