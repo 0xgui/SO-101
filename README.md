@@ -105,6 +105,16 @@ If you encounter PyTorch CUDA errors with newer GPUs (e.g., RTX 5070 Ti), the IL
 
 ## Scripts
 
+### `health_check.py`
+
+Checks the local environment before robot work: active conda env, LeRobot CLI
+commands, serial ports and permissions, PlatformIO, OpenSCAD, face-display port
+config, and known robot IDs.
+
+```bash
+python3 health_check.py
+```
+
 ### `test_servo.py`
 
 Auto-detects the range of a single servo and sweeps min → center → max.
