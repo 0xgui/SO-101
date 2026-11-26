@@ -3,6 +3,12 @@
 
 Build notes and tooling for the [SO-101 robot arm](https://github.com/TheRobotStudio/SO-ARM100) — two arms (leader + follower) using STS3215 servos and LeRobot.
 
+## Data and policy on the Hub
+
+- Dataset: [0xGUI/so101_first_motion](https://huggingface.co/datasets/0xGUI/so101_first_motion): 50 teleoperated episodes of "pick and place blue duck", 23,733 frames at 30 fps, front and side cameras
+- Policy: [0xGUI/act_so101_first_motion](https://huggingface.co/0xGUI/act_so101_first_motion): ACT trained on that dataset and run on the follower arm
+- Rollout on the real arm: [0xGUI/eval_so101_first_motion](https://huggingface.co/datasets/0xGUI/eval_so101_first_motion)
+
 ## Hardware
 
 - 13x STS3215 7.4V servos (7 follower, 6 leader)
